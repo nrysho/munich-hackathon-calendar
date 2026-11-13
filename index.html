@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Munich Hackathon Calendar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: summary strip, filter bar, two month grids side by side, then a dated event list. */
+:root {
+  --bg: #f5f6fa; --surface: #ffffff; --fg: #171b26; --muted: #5a6274; --line: #dde1ea;
+  --accent: #3b4fd8;
+  --hack: #3b4fd8; --talk: #0c7d76; --conf: #8f45bd; --comp: #b25d14;
+  --ok: #1a7a48; --warn: #9c5e00; --off: #747b8d;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11141b; --surface: #191d27; --fg: #e8ebf2; --muted: #9aa3b5; --line: #2b3141;
+    --accent: #909dff;
+    --hack: #909dff; --talk: #4fd0c5; --conf: #cb95ec; --comp: #e9a368;
+    --ok: #5fd08f; --warn: #f0b24a; --off: #858da0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11141b; --surface: #191d27; --fg: #e8ebf2; --muted: #9aa3b5; --line: #2b3141;
+  --accent: #909dff;
+  --hack: #909dff; --talk: #4fd0c5; --conf: #cb95ec; --comp: #e9a368;
+  --ok: #5fd08f; --warn: #f0b24a; --off: #858da0;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 28px; }
+h1 { font-family: var(--display); font-size: 30px; line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-size: 19px; margin: 0; }
+h3 { font-family: var(--display); font-size: 17px; margin: 0; line-height: 1.3; text-wrap: balance; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+header { display: flex; flex-direction: column; gap: 8px; }
+header p { max-width: 68ch; }
+
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 8px; }
+.plan ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; max-width: 80ch; }
+
+.filters { display: flex; flex-direction: column; gap: 12px; }
+.frow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.flabel { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); width: 64px; flex: none; }
+.chip { font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.chip:focus-visible, .cal button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.check { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; margin-right: 12px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+.months { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.month { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.dow { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: center; padding-bottom: 2px; }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; min-height: 74px; padding: 4px;
+  display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.day.blank { background: transparent; border-color: transparent; }
+.day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.day.work .num { color: var(--muted); }
+.num { font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.cal button { font: inherit; font-size: 11px; line-height: 1.25; text-align: left; border: 0; border-radius: 4px; padding: 2px 4px;
+  cursor: pointer; color: var(--bg); background: var(--tc); overflow-wrap: anywhere; }
+.cal button.dim { background: transparent; color: var(--off); box-shadow: inset 0 0 0 1px var(--line); text-decoration: line-through; }
+.t-hack { --tc: var(--hack); } .t-talk { --tc: var(--talk); } .t-conf { --tc: var(--conf); } .t-comp { --tc: var(--comp); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--tc); margin-right: 6px; }
+
+.list { display: flex; flex-direction: column; gap: 10px; }
+.ev { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: 4px 18px; scroll-margin-top: 16px; }
+.ev.flash { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.ev.dim h3, .ev.dim .when { color: var(--off); }
+.when { font-family: var(--display); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.when small { display: block; font-family: var(--body); font-weight: 400; font-size: 12px; color: var(--muted); }
+.body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 999px; color: var(--pc);
+  background: color-mix(in srgb, var(--pc) 14%, transparent); white-space: nowrap; }
+.p-open { --pc: var(--ok); } .p-soon { --pc: var(--warn); } .p-closed, .p-over { --pc: var(--off); }
+.p-fits { --pc: var(--ok); } .p-leave { --pc: var(--warn); } .p-type { --pc: var(--tc); } .p-pts { --pc: var(--accent); }
+dl { margin: 0; display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 2px 10px; font-size: 13.5px; }
+dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
+.sum { max-width: 70ch; }
+.tags { font-size: 12px; color: var(--muted); }
+a { color: var(--accent); }
+.empty { padding: 24px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 10px; }
+footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 560px) {
+  h1 { font-size: 25px; }
+  .ev { grid-template-columns: minmax(0, 1fr); }
+  .day { min-height: 54px; padding: 3px; }
+  .cal button { font-size: 0; padding: 0; width: 100%; height: 12px; }
+  .flabel { width: 100%; }
+}
+@media (prefers-reduced-motion: no-preference) { .ev { transition: box-shadow .25s, border-color .25s; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Munich Hackathon Calendar</h1>
+    <p class="muted">Hackathons, talks and startup events in and around Munich, plus online ones, collected from community tips and public listings. Last checked on 13 November 2026. Sign-up status updates itself from today's date. Times are Munich time.</p>
+  </header>
+
+  <section class="filters" aria-label="Filters">
+    <div class="frow" id="f-topic"><span class="flabel">Topic</span></div>
+    <div class="frow" id="f-type"><span class="flabel">Type</span></div>
+    <div class="frow" id="f-where"><span class="flabel">Where</span></div>
+    <div class="frow"><span class="flabel">Show</span>
+      <label class="check" for="c-fit"><input type="checkbox" id="c-fit"> Friday to Sunday or online only</label>
+      <label class="check" for="c-open"><input type="checkbox" id="c-open" checked> Hide closed and past</label>
+    </div>
+  </section>
+
+  <section aria-label="Calendar" style="display:flex;flex-direction:column;gap:12px">
+    <div class="months" id="months"></div>
+    <div class="legend">
+      <span class="t-hack">Hackathon or challenge</span><span class="t-talk">Talk, workshop or meetup</span>
+      <span class="t-conf">Conference</span><span class="t-comp">Competition</span>
+    </div>
+  </section>
+
+  <section aria-label="Events" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="count">Events</h2>
+    <div class="list" id="list"></div>
+  </section>
+
+  <footer>
+    <p>Tracking parameters are removed from links, and each link label shows the real domain. Details can change, so check the organiser's page before you plan around an event.</p>
+    <p>Drive times are rough estimates from Munich. "No deadline stated" means the page gave none, so the event start is used for the countdown.</p>
+  </footer>
+</div>
+
+<script src="events.js"></script>
+<script>
+const TOPICS = { ai: "AI", robotics: "Robotics", hardware: "Hardware and embedded", software: "Software and dev tools",
+  games: "Games and XR", quantum: "Quantum", space: "Space and aerospace", mobility: "Mobility", health: "Health", pitch: "Pitch and demo", challenge: "Business challenge",
+  visit: "Company visit", conference: "Conference", founder: "Founder talk" };
+const TYPES = { hack: "Hackathon", talk: "Talk or meetup", conf: "Conference", comp: "Competition" };
+const WHERE = { munich: "Munich area", away: "Further away", online: "Online" };
+
+
+const pad = n => String(n).padStart(2, "0");
+const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+const TODAY = iso(new Date());
+const daysTo = s => Math.round((parse(s) - parse(TODAY)) / 864e5);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function status(e) {
+  if (e.end < TODAY) return ["over", "Over"];
+  if (e.reg === "closed" || (e.deadline && e.deadline < TODAY)) return ["closed", "Sign-up closed"];
+  if (e.reg === "waitlist") return ["soon", "Waitlist only"];
+  const n = daysTo(e.deadline || e.start);
+  const verb = e.deadline ? "Closes" : "Starts";
+  if (!e.deadline && n <= 0) return ["soon", n === 0 ? "Today" : "Running now"];
+  if (n <= 5) return ["soon", verb + (n === 0 ? " today" : n === 1 ? " tomorrow" : " in " + n + " days")];
+  if (e.reg === "approval") return ["open", "Open, approval needed"];
+  if (e.reg === "unknown") return ["soon", "Sign-up not confirmed"];
+  return ["open", "Sign-up open"];
+}
+const isDead = e => ["over", "closed"].includes(status(e)[0]);
+
+const sel = { topic: new Set(), type: new Set(), where: new Set() };
+function chips(rowId, key, map) {
+  const row = document.getElementById(rowId);
+  const used = new Set(EVENTS.flatMap(e => key === "topic" ? e.topics : [e[key]]));
+  for (const k of Object.keys(map)) {
+    if (!used.has(k)) continue;
+    const b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = map[k]; b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => {
+      sel[key].has(k) ? sel[key].delete(k) : sel[key].add(k);
+      b.setAttribute("aria-pressed", String(sel[key].has(k))); render();
+    });
+    row.appendChild(b);
+  }
+}
+chips("f-topic", "topic", TOPICS); chips("f-type", "type", TYPES); chips("f-where", "where", WHERE);
+const cFit = document.getElementById("c-fit"), cOpen = document.getElementById("c-open");
+cFit.addEventListener("change", render); cOpen.addEventListener("change", render);
+
+function visible() {
+  return EVENTS.filter(e =>
+    (!sel.topic.size || e.topics.some(t => sel.topic.has(t))) &&
+    (!sel.type.size || sel.type.has(e.type)) &&
+    (!sel.where.size || sel.where.has(e.where)) &&
+    (!cFit.checked || e.where === "online" || eventDays(e).every(d => [5, 6, 0].includes(parse(d).getDay()))) &&
+    (!cOpen.checked || !isDead(e))
+  ).sort((a, b) => (a.calDays ? a.calDays[0] : a.start).localeCompare(b.calDays ? b.calDays[0] : b.start));
+}
+
+function eventDays(e) {
+  if (e.calDays) return e.calDays;
+  const out = []; const d = parse(e.start); const end = parse(e.end);
+  while (d <= end) { out.push(iso(d)); d.setDate(d.getDate() + 1); }
+  return out;
+}
+
+function renderMonths(list) {
+  const byDay = {};
+  for (const e of list) for (const d of eventDays(e)) (byDay[d] = byDay[d] || []).push(e);
+  let html = "";
+  for (const [y, m, name] of [[2026, 10, "November"], [2026, 11, "December"], [2027, 0, "January"]]) {
+    html += '<div class="month"><h2>' + name + " " + y + '</h2><div class="cal">';
+    html += ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => '<div class="dow">' + d + "</div>").join("");
+    const lead = (new Date(y, m, 1).getDay() + 6) % 7;
+    for (let i = 0; i < lead; i++) html += '<div class="day blank"></div>';
+    const n = new Date(y, m + 1, 0).getDate();
+    for (let d = 1; d <= n; d++) {
+      const key = y + "-" + pad(m + 1) + "-" + pad(d);
+      const wd = new Date(y, m, d).getDay();
+      html += '<div class="day' + (key === TODAY ? " today" : "") + '"><span class="num">' + d + "</span>";
+      for (const e of byDay[key] || [])
+        html += '<button type="button" class="t-' + e.type + (isDead(e) ? " dim" : "") + '" data-go="' + e.id + '" aria-label="' +
+          esc(e.title) + '" title="' + esc(e.title) + '">' + esc(e.short || e.title) + "</button>";
+      html += "</div>";
+    }
+    html += "</div></div>";
+  }
+  document.getElementById("months").innerHTML = html;
+}
+
+function whenLabel(e) {
+  const s = parse(e.calDays ? e.calDays[0] : e.start), en = parse(e.end);
+  const one = d => DOW[d.getDay()] + " " + d.getDate() + " " + MON[d.getMonth()];
+  let t = one(s);
+  if (!e.calDays && e.end !== e.start) t = DOW[s.getDay()] + " " + s.getDate() + (s.getMonth() !== en.getMonth() ? " " + MON[s.getMonth()] : "") + " to " + one(en);
+  if (s.getFullYear() !== 2026) t += " " + s.getFullYear();
+  return t;
+}
+
+function renderList(list) {
+  const el = document.getElementById("list");
+  document.getElementById("count").textContent = list.length + (list.length === 1 ? " event" : " events");
+  if (!list.length) { el.innerHTML = '<div class="empty">No events match these filters. Clear a filter or untick "Hide closed and past".</div>'; return; }
+  el.innerHTML = list.map(e => {
+    const [sc, sl] = status(e);
+    const host = e.url ? new URL(e.url).hostname.replace(/^www\./, "") : "";
+    const tags = e.topics.map(t => TOPICS[t]).join(" · ");
+    return '<article class="ev t-' + e.type + (isDead(e) ? " dim" : "") + '" id="ev-' + e.id + '">' +
+      '<div class="when">' + esc(whenLabel(e)) + "<small>" + esc(e.time) + "</small></div>" +
+      '<div class="body"><h3>' + esc(e.title) + "</h3>" +
+      '<div class="pills"><span class="pill p-' + sc + '">' + esc(sl) + '</span><span class="pill p-type">' + TYPES[e.type] + "</span></div>" +
+      '<p class="sum">' + esc(e.sum) + "</p><dl>" +
+      "<dt>Sign-up</dt><dd>" + esc(e.deadlineText) + "</dd>" +
+      "<dt>Where</dt><dd>" + esc(e.place) + "</dd>" +
+      "<dt>Cost</dt><dd>" + esc(e.cost) + "</dd>" +
+      "<dt>Link</dt><dd>" + (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener noreferrer">' + esc(host) + "</a>" : "None available") + "</dd>" +
+      "<dt>Source</dt><dd>" + esc(e.src) + "</dd></dl>" +
+      (tags ? '<div class="tags">' + esc(tags) + "</div>" : "") + "</div></article>";
+  }).join("");
+}
+
+function render() { const list = visible(); renderMonths(list); renderList(list); }
+document.getElementById("months").addEventListener("click", ev => {
+  const b = ev.target.closest("button[data-go]"); if (!b) return;
+  const card = document.getElementById("ev-" + b.dataset.go); if (!card) return;
+  card.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1400);
+});
+render();
+</script>
+</body>
+</html>
