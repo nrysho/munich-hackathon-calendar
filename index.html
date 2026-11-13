@@ -68,6 +68,7 @@ header p { max-width: 68ch; }
 .day.today { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .day.work .num { color: var(--muted); }
 .num { font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+.wd { display: none; }
 .cal button { font: inherit; font-size: 11px; line-height: 1.25; text-align: left; border: 0; border-radius: 4px; padding: 2px 4px;
   cursor: pointer; color: var(--bg); background: var(--tc); overflow-wrap: anywhere; }
 .cal button.dim { background: transparent; color: var(--off); box-shadow: inset 0 0 0 1px var(--line); text-decoration: line-through; }
@@ -98,8 +99,12 @@ footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; f
 @media (max-width: 560px) {
   h1 { font-size: 25px; }
   .ev { grid-template-columns: minmax(0, 1fr); }
-  .day { min-height: 54px; padding: 3px; }
-  .cal button { font-size: 0; padding: 0; width: 100%; height: 12px; }
+  .cal { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .dow, .day.blank, .day:not(.has) { display: none; }
+  .day { min-height: 0; padding: 8px 10px; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .num { flex: none; width: 58px; font-size: 13px; }
+  .wd { display: inline; font-weight: 400; color: var(--muted); }
+  .cal button { font-size: 13px; padding: 5px 9px; }
   .flabel { width: 100%; }
 }
 @media (prefers-reduced-motion: no-preference) { .ev { transition: box-shadow .25s, border-color .25s; } }
@@ -223,7 +228,7 @@ function renderMonths(list) {
     for (let d = 1; d <= n; d++) {
       const key = y + "-" + pad(m + 1) + "-" + pad(d);
       const wd = new Date(y, m, d).getDay();
-      html += '<div class="day' + (key === TODAY ? " today" : "") + '"><span class="num">' + d + "</span>";
+      html += '<div class="day' + (key === TODAY ? " today" : "") + (byDay[key] ? " has" : "") + '"><span class="num">' + d + '<span class="wd"> ' + DOW[wd] + "</span></span>";
       for (const e of byDay[key] || [])
         html += '<button type="button" class="t-' + e.type + (isDead(e) ? " dim" : "") + '" data-go="' + e.id + '" aria-label="' +
           esc(e.title) + '" title="' + esc(e.title) + '">' + esc(e.short || e.title) + "</button>";
