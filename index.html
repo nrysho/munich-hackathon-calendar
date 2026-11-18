@@ -115,7 +115,7 @@ footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; f
 <div class="wrap">
   <header>
     <h1>Munich Hackathon Calendar</h1>
-    <p class="muted">Hackathons, talks and startup events in and around Munich, plus online ones, collected from community tips and public listings. Last checked on 13 November 2026. Sign-up status updates itself from today's date. Times are Munich time.</p>
+    <p class="muted">Hackathons, talks and startup events in and around Munich, plus online ones, collected from community tips and public listings. Last checked on 19 November 2026. Sign-up status updates itself from today's date. Times are Munich time.</p>
   </header>
 
   <section class="filters" aria-label="Filters">
@@ -219,7 +219,7 @@ function renderMonths(list) {
   const byDay = {};
   for (const e of list) for (const d of eventDays(e)) (byDay[d] = byDay[d] || []).push(e);
   let html = "";
-  for (const [y, m, name] of [[2026, 10, "November"], [2026, 11, "December"], [2027, 0, "January"]]) {
+  for (const [y, m, name] of [[2026, 10, "November"], [2026, 11, "December"], [2027, 0, "January"], [2027, 1, "February"]]) {
     html += '<div class="month"><h2>' + name + " " + y + '</h2><div class="cal">';
     html += ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => '<div class="dow">' + d + "</div>").join("");
     const lead = (new Date(y, m, 1).getDay() + 6) % 7;
