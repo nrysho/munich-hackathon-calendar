@@ -96,6 +96,17 @@ dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
 a { color: var(--accent); }
 .empty { padding: 24px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 10px; }
 footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; flex-direction: column; gap: 6px; }
+.search { position: relative; max-width: 520px; }
+.search input { width: 100%; font: inherit; font-size: 15px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--fg); }
+.search input::placeholder { color: var(--muted); }
+.hits { position: absolute; top: 100%; left: 0; right: 0; z-index: 15; margin-top: 4px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px color-mix(in srgb, var(--fg) 14%, transparent); }
+.hits button { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; width: 100%; text-align: left; font: inherit;
+  padding: 9px 14px; border: 0; background: none; color: var(--fg); cursor: pointer; }
+.hits button:hover, .hits button:focus-visible { background: color-mix(in srgb, var(--accent) 10%, transparent); outline: none; }
+.hits button.dim span { color: var(--off); text-decoration: line-through; }
+.hits small { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
 [hidden] { display: none !important; }
 .day.has { cursor: pointer; }
 .day.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
@@ -126,6 +137,10 @@ footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; f
   <header>
     <h1>Munich Hackathon Calendar</h1>
     <p class="muted">Hackathons, talks and startup events in and around Munich, plus online ones, collected from community tips and public listings. Last checked on 19 November 2026. Sign-up status updates itself from today's date. Times are Munich time.</p>
+    <div class="search">
+      <input type="search" id="q" aria-label="Search events" placeholder="Search events, for example robotics or Zurich" autocomplete="off">
+      <div class="hits" id="hits" hidden></div>
+    </div>
   </header>
 
   <section class="filters" aria-label="Filters">
@@ -313,6 +328,51 @@ function render() {
   const list = visible(); renderMonths(list); renderList(list);
   if (openDay) BYDAY[openDay] ? showDay(openDay) : closeSide();
 }
+const q = document.getElementById("q"), hits = document.getElementById("hits");
+const firstDay = e => e.calDays ? e.calDays[0] : (eventDays(e).find(d => d >= TODAY) || e.start);
+function findEvents(text) {
+  const words = text.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  return EVENTS.filter(e => {
+    const hay = [e.title, e.short || "", e.place, e.sum, TYPES[e.type], WHERE[e.where], e.topics.map(t => TOPICS[t]).join(" ")].join(" ").toLowerCase();
+    return words.every(w => hay.includes(w));
+  }).sort((a, b) => isDead(a) - isDead(b) || firstDay(a).localeCompare(firstDay(b)));
+}
+function showHits() {
+  const found = findEvents(q.value).slice(0, 7);
+  hits.innerHTML = found.map(e => '<button type="button" data-id="' + e.id + '"' + (isDead(e) ? ' class="dim"' : "") + "><span>" +
+    esc(e.title) + "</span><small>" + esc(whenLabel(e)) + "</small></button>").join("");
+  hits.hidden = !found.length;
+  return found;
+}
+function goTo(e) {
+  if (!visible().includes(e)) {
+    for (const k of Object.keys(sel)) sel[k].clear();
+    for (const b of document.querySelectorAll(".filters .chip")) b.setAttribute("aria-pressed", "false");
+    cFit.checked = false; cOpen.checked = false;
+    render();
+  }
+  hits.hidden = true;
+  const key = firstDay(e);
+  showDay(key);
+  const cards = document.getElementById("side-list").children, i = (BYDAY[key] || []).indexOf(e);
+  if (cards && cards[i]) cards[i].classList.add("flash");
+  const cell = document.querySelector('.day[data-day="' + key + '"]');
+  if (cell) cell.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+}
+q.addEventListener("input", showHits);
+q.addEventListener("focus", showHits);
+q.addEventListener("keydown", ev => {
+  if (ev.key === "Enter") { const found = showHits(); if (found.length) goTo(found[0]); }
+  if (ev.key === "Escape") { hits.hidden = true; ev.stopPropagation(); }
+});
+hits.addEventListener("click", ev => {
+  const b = ev.target.closest("button[data-id]");
+  const e = b && EVENTS.find(x => x.id === b.dataset.id);
+  if (e) goTo(e);
+});
+document.addEventListener("click", ev => { if (!ev.target.closest(".search")) hits.hidden = true; });
+
 document.getElementById("months").addEventListener("click", ev => {
   const cell = ev.target.closest(".day.has");
   if (cell) showDay(cell.dataset.day);
