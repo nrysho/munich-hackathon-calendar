@@ -96,6 +96,16 @@ dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
 a { color: var(--accent); }
 .empty { padding: 24px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 10px; }
 footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; flex-direction: column; gap: 6px; }
+[hidden] { display: none !important; }
+.day.has { cursor: pointer; }
+.day.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--surface)); }
+.side { position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); z-index: 20; background: var(--bg);
+  border-left: 1px solid var(--line); box-shadow: -8px 0 24px color-mix(in srgb, var(--fg) 12%, transparent);
+  overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 12px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) 16px; }
+.side-head { position: sticky; top: 0; z-index: 1; background: var(--bg); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 8px; }
+.side .ev { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { body.side-open { padding-right: 460px; } }
 @media (max-width: 560px) {
   h1 { font-size: 25px; }
   .ev { grid-template-columns: minmax(0, 1fr); }
@@ -148,6 +158,11 @@ footer { font-size: 13px; color: var(--muted); max-width: 80ch; display: flex; f
 </div>
 
 <script src="events.js"></script>
+<aside class="side" id="side" aria-labelledby="side-title" hidden>
+  <div class="side-head"><h2 id="side-title"></h2><button type="button" class="chip" id="side-close">Close</button></div>
+  <div class="list" id="side-list"></div>
+</aside>
+
 <script>
 const TOPICS = { ai: "AI", robotics: "Robotics", hardware: "Hardware and embedded", software: "Software and dev tools",
   games: "Games and XR", quantum: "Quantum", space: "Space and aerospace", mobility: "Mobility", health: "Health", pitch: "Pitch and demo", challenge: "Business challenge",
@@ -179,6 +194,7 @@ function status(e) {
 }
 const isDead = e => ["over", "closed"].includes(status(e)[0]);
 
+let BYDAY = {}, openDay = null;
 const sel = { topic: new Set(), type: new Set(), where: new Set() };
 function chips(rowId, key, map) {
   const row = document.getElementById(rowId);
@@ -216,7 +232,7 @@ function eventDays(e) {
 }
 
 function renderMonths(list) {
-  const byDay = {};
+  const byDay = BYDAY = {};
   for (const e of list) for (const d of eventDays(e)) (byDay[d] = byDay[d] || []).push(e);
   let html = "";
   for (const [y, m, name] of [[2026, 10, "November"], [2026, 11, "December"], [2027, 0, "January"], [2027, 1, "February"]]) {
@@ -228,9 +244,9 @@ function renderMonths(list) {
     for (let d = 1; d <= n; d++) {
       const key = y + "-" + pad(m + 1) + "-" + pad(d);
       const wd = new Date(y, m, d).getDay();
-      html += '<div class="day' + (key === TODAY ? " today" : "") + (byDay[key] ? " has" : "") + '"><span class="num">' + d + '<span class="wd"> ' + DOW[wd] + "</span></span>";
+      html += '<div class="day' + (key === TODAY ? " today" : "") + (byDay[key] ? " has" : "") + (key === openDay ? " sel" : "") + '" data-day="' + key + '"><span class="num">' + d + '<span class="wd"> ' + DOW[wd] + "</span></span>";
       for (const e of byDay[key] || [])
-        html += '<button type="button" class="t-' + e.type + (isDead(e) ? " dim" : "") + '" data-go="' + e.id + '" aria-label="' +
+        html += '<button type="button" class="t-' + e.type + (isDead(e) ? " dim" : "") + '" aria-label="' +
           esc(e.title) + '" title="' + esc(e.title) + '">' + esc(e.short || e.title) + "</button>";
       html += "</div>";
     }
@@ -252,11 +268,14 @@ function renderList(list) {
   const el = document.getElementById("list");
   document.getElementById("count").textContent = list.length + (list.length === 1 ? " event" : " events");
   if (!list.length) { el.innerHTML = '<div class="empty">No events match these filters. Clear a filter or untick "Hide closed and past".</div>'; return; }
-  el.innerHTML = list.map(e => {
+  el.innerHTML = list.map(e => card(e)).join("");
+}
+
+function card(e) {
     const [sc, sl] = status(e);
     const host = e.url ? new URL(e.url).hostname.replace(/^www\./, "") : "";
     const tags = e.topics.map(t => TOPICS[t]).join(" · ");
-    return '<article class="ev t-' + e.type + (isDead(e) ? " dim" : "") + '" id="ev-' + e.id + '">' +
+    return '<article class="ev t-' + e.type + (isDead(e) ? " dim" : "") + '">' +
       '<div class="when">' + esc(whenLabel(e)) + "<small>" + esc(e.time) + "</small></div>" +
       '<div class="body"><h3>' + esc(e.title) + "</h3>" +
       '<div class="pills"><span class="pill p-' + sc + '">' + esc(sl) + '</span><span class="pill p-type">' + TYPES[e.type] + "</span></div>" +
@@ -267,16 +286,39 @@ function renderList(list) {
       "<dt>Link</dt><dd>" + (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener noreferrer">' + esc(host) + "</a>" : "None available") + "</dd>" +
       "<dt>Source</dt><dd>" + esc(e.src) + "</dd></dl>" +
       (tags ? '<div class="tags">' + esc(tags) + "</div>" : "") + "</div></article>";
-  }).join("");
 }
 
-function render() { const list = visible(); renderMonths(list); renderList(list); }
+const side = document.getElementById("side");
+function showDay(key) {
+  const evs = BYDAY[key];
+  if (!evs) return;
+  openDay = key;
+  const d = parse(key);
+  document.getElementById("side-title").textContent = DOW[d.getDay()] + " " + d.getDate() + " " + MON[d.getMonth()] +
+    (d.getFullYear() !== 2026 ? " " + d.getFullYear() : "") + " · " + evs.length + (evs.length === 1 ? " event" : " events");
+  document.getElementById("side-list").innerHTML = evs.map(e => card(e)).join("");
+  for (const el of document.querySelectorAll(".day.sel")) el.classList.remove("sel");
+  const cell = document.querySelector('.day[data-day="' + key + '"]');
+  if (cell) cell.classList.add("sel");
+  side.hidden = false; side.scrollTop = 0;
+  document.body.classList.add("side-open");
+}
+function closeSide() {
+  openDay = null; side.hidden = true;
+  document.body.classList.remove("side-open");
+  for (const el of document.querySelectorAll(".day.sel")) el.classList.remove("sel");
+}
+
+function render() {
+  const list = visible(); renderMonths(list); renderList(list);
+  if (openDay) BYDAY[openDay] ? showDay(openDay) : closeSide();
+}
 document.getElementById("months").addEventListener("click", ev => {
-  const b = ev.target.closest("button[data-go]"); if (!b) return;
-  const card = document.getElementById("ev-" + b.dataset.go); if (!card) return;
-  card.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-  card.classList.add("flash"); setTimeout(() => card.classList.remove("flash"), 1400);
+  const cell = ev.target.closest(".day.has");
+  if (cell) showDay(cell.dataset.day);
 });
+document.getElementById("side-close").addEventListener("click", closeSide);
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && openDay) closeSide(); });
 render();
 </script>
 </body>
