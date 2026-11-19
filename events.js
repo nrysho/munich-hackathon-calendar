@@ -19,7 +19,7 @@ const EVENTS = [
     "cost": "Not stated",
     "sum": "Open day at Ingolstadt's digital founder centre: keynote, trade fair, roundtables on AI and XR in industry, and a makerspace tour. Aimed at company managers more than students.",
     "url": "https://www.brigk.digital/starting-with-a-brigk/",
-    "src": "Community tip"
+    "src": "brigk"
   },
   {
     "id": "gamejam",
@@ -41,7 +41,7 @@ const EVENTS = [
     "cost": "Free, with lunch, drinks and tool credits",
     "sum": "One-day jam by HACK//OPS for the Chroma Awards. Sign up alone, form teams of up to four, and build a playable browser game with AI tools. Beginners welcome.",
     "url": "https://germanhackathons.com/en/events/game-jam-munich",
-    "src": "Community tip"
+    "src": "Hackathon Deutschland"
   },
   {
     "id": "pitchrun",
@@ -62,7 +62,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Networking event by Springboard Health Angels. The page has no description, so the pitch-plus-run format is a guess from the name.",
     "url": "https://luma.com/yajf52j9",
-    "src": "Community tip"
+    "src": "Springboard Health Angels on Luma"
   },
   {
     "id": "femfound",
@@ -83,7 +83,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Startup Spotlight keynote and Q&A with the co-founders of Movitus, an LMU logistics software spin-off. In English.",
     "url": "https://luma.com/fhmifvei",
-    "src": "Community tip"
+    "src": "LMU Innovation Incubator on Luma"
   },
   {
     "id": "tumai",
@@ -104,7 +104,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "48 hours, about 120 people, teams of 2 to 5, €3,000 in prizes. Two tracks: AI that finds errors in bills of quantities, and an AI assistant for site paperwork.",
     "url": "https://luma.com/lj00k6tv",
-    "src": "Community tip"
+    "src": "TUM.ai on Luma"
   },
   {
     "id": "starthack",
@@ -144,9 +144,9 @@ const EVENTS = [
     "deadlineText": "No deadline stated. Every ticket needs host approval.",
     "place": "Berlin, address shown after approval (about 6 h drive from Munich)",
     "cost": "Free",
-    "sum": "AI hackathon for 350 builders by Tech: Europe, co-hosted by Google DeepMind. A community tip says the last edition had over €20,000 in cash prizes; the page lists none.",
+    "sum": "AI hackathon for 350 builders by Tech: Europe with CODE University and The Delta Campus, co-hosted by Google DeepMind. The organiser's pages advertise between €25,000 and €50,000 in prizes across cash, hardware and credits.",
     "url": "https://luma.com/bbh",
-    "src": "Community tip"
+    "src": "Tech: Europe on Luma"
   },
   {
     "id": "ese",
@@ -160,15 +160,15 @@ const EVENTS = [
     "where": "away",
     "start": "2026-11-30",
     "end": "2026-11-30",
-    "time": "Monday, times not checked",
+    "time": "Monday, start time not published",
     "reg": "open",
     "deadline": null,
     "deadlineText": "No deadline stated.",
-    "place": "ESE Kongress, Sindelfingen (about 2.5 h from Munich)",
+    "place": "Congress Center Stadthalle Sindelfingen (about 2.5 h from Munich)",
     "cost": "€190",
-    "sum": "You program an environmental sensor in Rust on a dev board. No Rust experience needed. Part of the Embedded Software Engineering Kongress, 30 November to 4 December.",
+    "sum": "Run by the Rust consultancy Systemscape. Each participant gets a Linux board and a multifunction sensor and builds a sensor application with guidance. No Rust experience needed. Part of the Embedded Software Engineering Kongress, 30 November to 4 December.",
     "url": "https://ese-kongress.de/",
-    "src": "Community tip"
+    "src": "ESE Kongress"
   },
   {
     "id": "buildit",
@@ -190,7 +190,7 @@ const EVENTS = [
     "cost": "€22 student pass for all three days",
     "sum": "Conference for software and AI builders, founders and investors, held with FOST Paris. Talks, workshops, a builders village and matchmaking sessions.",
     "url": "https://builditsummit.com/tickets/",
-    "src": "Community tip"
+    "src": "Build It Summit"
   },
   {
     "id": "devfest",
@@ -208,12 +208,12 @@ const EVENTS = [
     "time": "09:00 to 17:30",
     "reg": "open",
     "deadline": null,
-    "deadlineText": "No deadline stated. RSVP on Meetup.",
+    "deadlineText": "No deadline stated. RSVP through the GDG community page linked from Meetup.",
     "place": "Google Munich, Erika-Mann-Straße 33",
     "cost": "Not stated",
     "sum": "Full-day developer conference by GDG Munich on AI, cloud and Google technologies, with talks and hands-on workshops. Bring a laptop for the workshops.",
     "url": "https://www.meetup.com/gdg-munich/events/317371676/",
-    "src": "Community tip"
+    "src": "GDG Munich on Meetup"
   },
   {
     "id": "perfectpitch",
@@ -291,17 +291,17 @@ const EVENTS = [
       "games"
     ],
     "where": "online",
-    "start": "2027-04-19",
-    "end": "2027-04-19",
+    "start": "2026-04-19",
+    "end": "2026-04-19",
     "time": "Submission deadline",
-    "reg": "open",
-    "deadline": "2027-04-19",
-    "deadlineText": "19 April. The post gave no year; 2027 is assumed.",
-    "place": "Submit remotely. For people in Bavaria up to age 26.",
+    "reg": "closed",
+    "deadline": "2026-04-19",
+    "deadlineText": "Closed on 19 April 2026. The call shared in October was for the 2026 edition; no 2027 call was published as of 19 November.",
+    "place": "Submit remotely. Entrants must live in Bavaria; age groups are up to 18 and 19 to 26.",
     "cost": "Not stated",
-    "sum": "Award by JFF, a Munich media-education institute, for games, prototypes, videos and audio on gaming culture.",
-    "url": null,
-    "src": "Community tip"
+    "sum": "Yearly award by the ComputerSpielAkademie at JFF's Medienzentrum München and the Bayerischer Jugendring for games, prototypes, videos and audio on gaming culture, with cash prizes in two age groups. SHORTCUT was the 2026 theme prize. Winners were announced at the GamesFestival in June 2026.",
+    "url": "https://gamesfestival.de/gamespreis/",
+    "src": "JFF and GamesFestival"
   },
   {
     "id": "mqv1",
@@ -729,7 +729,7 @@ const EVENTS = [
     "cost": "Free, with a conference ticket",
     "sum": "30-hour blockchain hackathon with a €12,000 prize pool.",
     "url": "https://hackathon.tum-blockchain.com",
-    "src": "Community tip"
+    "src": "TUM Blockchain Club"
   },
   {
     "id": "deeptech",
@@ -750,7 +750,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Panel with engineers from Proxima Fusion, Phlair, Radical Dot and microagi on moving from technical study into deep-tech startups, then Q&A and networking.",
     "url": "https://luma.com/8xps0s21",
-    "src": "Community tip"
+    "src": "Luma"
   },
   {
     "id": "astro",
@@ -813,7 +813,7 @@ const EVENTS = [
     "cost": "Pays a €5,000 stipend",
     "sum": "Ten-week fellowship at the Humboldt Institute for Internet and Society on assessing the social and environmental impact of an AI use case. A master's degree is generally required. Needs a CV and motivation letter.",
     "url": "https://www.hiig.de/en/impact-ai-call-for-fellows/",
-    "src": "Community tip"
+    "src": "HIIG"
   },
   {
     "id": "pretzels",
@@ -834,7 +834,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Bits & Pretzels community event. Founders pitch one-to-one to an investor jury, the selected ones pitch on stage for 90 seconds with Q&A, and a winner is picked.",
     "url": "https://luma.com/ispbtuyl",
-    "src": "Community tip"
+    "src": "Bits & Pretzels on Luma"
   },
   {
     "id": "venturecon",
@@ -874,7 +874,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Manage and More evening where visiting student researchers share how they did their thesis at universities abroad, followed by networking.",
     "url": "https://luma.com/dakv51g1",
-    "src": "Community tip"
+    "src": "Manage and More on Luma"
   },
   {
     "id": "citydemo",
@@ -1002,7 +1002,7 @@ const EVENTS = [
     "cost": "Not stated",
     "sum": "Yearly tech quiz where university teams compete against about 30 universities across Europe for prizes. One registration per team.",
     "url": "https://lp.jetbrains.media/student-tech-quiz-2026/",
-    "src": "Community tip"
+    "src": "JetBrains"
   },
   {
     "id": "made",
@@ -1045,9 +1045,9 @@ const EVENTS = [
     "deadlineText": "No deadline stated. Host approval required; 80 spots were left on 19 November.",
     "place": "Zurich, address not listed (about 3.5 h drive from Munich)",
     "cost": "Free",
-    "sum": "40-hour robotics hackathon. Teams of 3 to 4 use computer vision to spot defective objects and steer a robot arm to sort them. Prizes of €5,000, €3,000 and €2,000.",
+    "sum": "Second European Robotics House hackathon, a 40-hour build that starts with an Intel workshop. Teams of 3 to 4 get an SO-101 robot arm, cameras and an Intel laptop, and use computer vision to spot defective objects and sort them. Prizes of €5,000, €3,000 and €2,000.",
     "url": "https://luma.com/d3pjvggt",
-    "src": "Community tip"
+    "src": "European Robotics House on Luma"
   },
   {
     "id": "stuttgart",
@@ -1178,7 +1178,7 @@ const EVENTS = [
     "cost": "Free",
     "sum": "Meetup for people who use or are exploring Amazon Quick, with sessions, discussion and networking.",
     "url": "https://luma.com/izg12flj",
-    "src": "Community tip"
+    "src": "Luma"
   },
   {
     "id": "cloud9",
@@ -1202,9 +1202,9 @@ const EVENTS = [
     "deadlineText": "Submit by 12 January 2027.",
     "place": "Online",
     "cost": "Free",
-    "sum": "Devpost hackathon by the esports team Cloud9 and JetBrains on gaming, AI and databases, with $25,000 across seven cash prizes. The page blocked reading, so details are from the Devpost listing only.",
+    "sum": "Esports hackathon by Cloud9 and JetBrains with $25,000 across seven cash prizes. The previous edition had teams build tools on League of Legends and VALORANT match data, with main prizes of $4,000 to $6,000. This year's rules page could not be read, so check eligibility there.",
     "url": "https://cloud9.devpost.com/",
-    "src": "Community tip"
+    "src": "Devpost and the JetBrains blog"
   },
   {
     "id": "euroteq",
@@ -1220,12 +1220,12 @@ const EVENTS = [
     "time": "Friday to Sunday",
     "reg": "open",
     "deadline": "2026-12-13",
-    "deadlineText": "Register by 13 December through TUMonline (course SOT99008), so it needs a TUM enrolment.",
+    "deadlineText": "Register by 13 December through TUMonline (course SOT99008). Earlier rounds were open to TUM students and doctoral candidates.",
     "place": "TUM. Place not stated.",
     "cost": "Not stated",
-    "sum": "Students from all disciplines pick a challenge from companies and NGOs on the theme of connections for sustainable futures, then refine it over six Collider Weeks. The best teams go on to the EuroTeQaThon.",
+    "sum": "Students from all disciplines pick a challenge from companies and NGOs on the theme of connections for sustainable futures, then refine it over six Collider Weeks. The best teams go on to the EuroTeQaThon. Questions go to euroteq@ja.tum.de.",
     "url": "https://www.ja.tum.de/en/ja/euroteq/",
-    "src": "Community tip"
+    "src": "TUM Junge Akademie"
   },
   {
     "id": "pico",
@@ -1248,8 +1248,8 @@ const EVENTS = [
     "deadlineText": "Submit by 1 February 2027.",
     "place": "Online",
     "cost": "Free",
-    "sum": "Devpost hackathon on AR/VR, AI and web with $50,000 across 15 cash prizes. The page blocked reading, so details are from the Devpost listing only.",
+    "sum": "Devpost hackathon on AR/VR, AI and web with $50,000 across 15 cash prizes. It appears to be linked to Pico, ByteDance's VR headset brand. Nothing beyond the Devpost listing could be found, so read the rules page first.",
     "url": "https://pico-space-program.devpost.com/",
-    "src": "Community tip"
+    "src": "Devpost"
   }
 ];
